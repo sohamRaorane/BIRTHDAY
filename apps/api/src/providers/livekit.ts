@@ -58,7 +58,10 @@ class LiveKitServerAdapter implements LiveKitAdapter {
       canPublish: true,
       canSubscribe: true,
       canPublishData: true,
-      hidden: participant.role === "ORGANIZER" ? false : true,
+      // LiveKit visibility is application-controlled here: hidden participant
+      // grants can suppress track discovery. Keep participants visible to media
+      // subscriptions and mask names in the client for non-organizer views.
+      hidden: false,
       canPublishSources: participant.role === "ORGANIZER"
         ? [TrackSource.MICROPHONE, TrackSource.SCREEN_SHARE]
         : [TrackSource.CAMERA, TrackSource.MICROPHONE, TrackSource.SCREEN_SHARE],

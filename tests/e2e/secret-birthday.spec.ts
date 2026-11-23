@@ -71,7 +71,7 @@ test('secret birthday invite privacy, organizer controls, reveal, media defaults
   const birthdayMeetingId = await roomIdFromSnapshot(birthdayPage);
   const birthdayToken = await birthdayPage.evaluate((id) => JSON.parse(sessionStorage.getItem(`livekit:${id}`) || '{}').token, birthdayMeetingId);
   const birthdayGrant = JSON.parse(Buffer.from(birthdayToken.split('.')[1], 'base64url').toString());
-  expect(birthdayGrant.video.hidden).toBe(true);
+  expect(birthdayGrant.video.hidden).not.toBe(true);
   await birthdayPage.reload();
   await expect(birthdayPage.getByRole('heading', { name: 'Meeting Room' })).toBeVisible();
   await expect(birthdayPage.getByRole('button', { name: 'Turn mic on' })).toBeEnabled();

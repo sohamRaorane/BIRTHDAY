@@ -165,7 +165,7 @@ function App() {
                 created.dataset.cameraParticipant = participant.identity;
                 const label = document.createElement("span");
                 label.className = "camera-name";
-                label.textContent = participant.name || "Participant";
+                label.textContent = organizer ? (participant.name || "Participant") : "Participant";
                 created.appendChild(label);
                 target.appendChild(created);
                 return created;
