@@ -236,6 +236,19 @@ router.get("/meetings/:id/media", async (req, res) => { const m = await getMeeti
   res.setHeader("Content-Length", size); mediaStorage.open(media.storageKey).on("error", () => { if (!res.headersSent) res.status(404).end(); }).pipe(res); });
 router.post("/meetings/:id/livekit-token", async (req, res) => { const m = await getMeeting(req); if (m.status === "ENDED" || m.status === "EXPIRED" || m.expiresAt <= new Date()) fail(410, "MEETING_CLOSED", "This meeting is closed"); const p = await getParticipant(req, m.id); const provider = livekitProvider(); const token = await provider.createParticipantToken(m.id, p.id, p.displayName); res.json({ token, url: provider.serverUrl, identity: p.id, roomName: m.livekitRoomName, expiresInSeconds: 900, mediaDefaults: { cameraEnabled: false, microphoneEnabled: false } }); });
 router.post("/meetings/:id/livekit/connected", async (req, res) => { const m = await getMeeting(req); const p = await getParticipant(req, m.id); const liveIdentities = await livekitProvider().listParticipantIdentities(m.livekitRoomName); if (!liveIdentities.has(p.id)) fail(409, "LIVEKIT_PARTICIPANT_NOT_CONNECTED", "LiveKit has not confirmed this participant in the room"); await prisma.meeting.updateMany({ where: { id: m.id, status: "SCHEDULED", expiresAt: { gt: new Date() } }, data: { status: "ACTIVE" } }); const updated = await prisma.meetingParticipant.update({ where: { id: p.id }, data: { connectionStatus: "CONNECTED" } }); publishParticipantStatus(m.id, updated); res.json({ participantId: p.id, connectionStatus: updated.connectionStatus }); });
+router.get("/meetings/:id/organizer/recording", async (req, res) => {
+  const m = await getMeeting(req); await assertOrganizer(req, m.id);
+  res.json(await livekitProvider().getRecording(m.id));
+});
+router.post("/meetings/:id/organizer/recording/start", controlLimit, async (req, res) => {
+  const m = await getMeeting(req); await assertOrganizer(req, m.id);
+  const recording = await livekitProvider().startRecording(m.livekitRoomName, m.id);
+  res.status(201).json({ active: true, ...recording });
+});
+router.post("/meetings/:id/organizer/recording/stop", controlLimit, async (req, res) => {
+  const m = await getMeeting(req); await assertOrganizer(req, m.id);
+  res.json({ active: false, ...await livekitProvider().stopRecording(m.id) });
+});
 router.post("/meetings/:id/chat", chatHttpLimit, async (req, res) => { const m = await getMeeting(req); const p = await getParticipant(req, m.id); const input = parse(chatSchema, req.body); if (p.leftAt) fail(403, "PARTICIPANT_LEFT", "Rejoin this meeting to chat"); const message = await prisma.chatMessage.create({ data: { meetingId: m.id, participantId: p.id, body: input.body }, include: { participant: { select: { id: true, displayName: true, visibility: true } } } }); const dto = { id: message.id, body: message.body, createdAt: message.createdAt, participant: { id: p.id, displayName: p.displayName } }; io.to(`meeting:${m.id}:organizer`).emit("chat:message", eventEnvelope(dto)); res.status(201).json(dto); });
 
 app.use("/api/v1", router);
