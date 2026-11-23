@@ -149,7 +149,12 @@ function App() {
       if (track.kind === Track.Kind.Video) {
         el.classList.add(publication.source === Track.Source.ScreenShare ? "screen-video" : "participant-video");
         const target = publication.source === Track.Source.ScreenShare ? stageRef.current : peopleStripRef.current;
-        if (target) target.appendChild(el);
+        if (target) {
+          el.dataset.trackSid = publication.trackSid;
+          const existing = target.querySelector(`[data-track-sid="${publication.trackSid}"]`);
+          if (existing) existing.replaceWith(el);
+          else target.appendChild(el);
+        }
       } else {
         el.classList.add("remote-audio");
         stageRef.current?.appendChild(el);
@@ -159,6 +164,11 @@ function App() {
     room.on(RoomEvent.TrackSubscribed, (_track, publication, participant) => attach(publication, participant));
     room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => detach(publication));
     room.on(RoomEvent.TrackPublished, (publication, participant) => { if (publication.track) attach(publication, participant); });
+    room.on(RoomEvent.ParticipantConnected, (participant) => {
+      participant.videoTrackPublications.forEach(publication => {
+        if (publication.track) attach(publication, participant);
+      });
+    });
     room.on(RoomEvent.LocalTrackPublished, (publication) => {
       if (publication.track) attach(publication, room.localParticipant);
       const isCamera = publication.source === Track.Source.Camera;
@@ -178,6 +188,11 @@ function App() {
     room.on(RoomEvent.Disconnected, () => setLkState("unavailable"));
     room.connect(credentials.url, credentials.token).then(async () => {
       setLkState("connected");
+      room.remoteParticipants.forEach(participant => {
+        participant.videoTrackPublications.forEach(publication => {
+          if (publication.track) attach(publication, participant);
+        });
+      });
       try { await api(`/meetings/${encodeURIComponent(snapshot.id)}/livekit/connected`, { method: "POST", body: JSON.stringify({}) }); }
       catch (e) { fail(e); }
     }).catch(e => { setLkState("unavailable"); setError(e instanceof Error ? `Media connection unavailable: ${e.message}` : "Media connection unavailable."); });
