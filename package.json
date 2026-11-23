@@ -12,18 +12,26 @@
   "scripts": {
     "dev:web": "npm --workspace @surprise/web run dev",
     "dev:api": "node --env-file=.env --import tsx --watch apps/api/src/index.ts",
-    "db:generate": "node --env-file=.env ./node_modules/prisma/build/index.js generate --config apps/api/prisma.config.ts",
-    "db:migrate": "node --env-file=.env ./node_modules/prisma/build/index.js migrate dev --config apps/api/prisma.config.ts --name init",
-    "db:deploy": "node --env-file=.env ./node_modules/prisma/build/index.js migrate deploy --config apps/api/prisma.config.ts",
+    "db:generate": "node --env-file=.env ./apps/api/node_modules/prisma/build/index.js generate --config apps/api/prisma.config.ts",
+    "db:migrate": "node --env-file=.env ./apps/api/node_modules/prisma/build/index.js migrate dev --config apps/api/prisma.config.ts --name init",
+    "db:deploy": "node --env-file=.env ./apps/api/node_modules/prisma/build/index.js migrate deploy --config apps/api/prisma.config.ts",
     "test:e2e": "playwright test",
     "build": "npm run build --workspace @surprise/api && npm run build --workspace @surprise/web",
     "start": "node apps/api/dist/index.js",
-    "db:generate:render": "node ./node_modules/prisma/build/index.js generate --config apps/api/prisma.config.ts",
-    "db:deploy:render": "node ./node_modules/prisma/build/index.js migrate deploy --config apps/api/prisma.config.ts"
+    "db:generate:render": "node ./apps/api/node_modules/prisma/build/index.js generate --config apps/api/prisma.config.ts",
+    "db:deploy:render": "node ./apps/api/node_modules/prisma/build/index.js migrate deploy --config apps/api/prisma.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
-    "prisma": "7.10.1"
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^24.10.0",
+    "@types/pg": "^8.15.5",
+    "prisma": "7.10.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@prisma/debug": "^7.10.1"

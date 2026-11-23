@@ -3,7 +3,7 @@ services:
     name: littlemoment
     runtime: node
     plan: free
-    buildCommand: npm install && npm run db:generate:render && npm run build && npm run db:deploy:render
+    buildCommand: npm ci --include=dev && npm run db:generate:render && npm run build && npm run db:deploy:render
     startCommand: npm start
     envVars:
       - key: NODE_ENV
