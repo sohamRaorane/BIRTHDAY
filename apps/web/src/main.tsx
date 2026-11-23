@@ -1,7 +1,7 @@
 import { StrictMode, useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { createRoot } from "react-dom/client";
 import { io, type Socket } from "socket.io-client";
-import { createLocalScreenTracks, Room, RoomEvent, Track, type Participant, type TrackPublication } from "livekit-client";
+import { createLocalScreenTracks, Room, RoomEvent, Track, type Participant, type RemoteTrackPublication, type TrackPublication } from "livekit-client";
 import type { MeetingSnapshot, VisibleParticipant } from "@surprise/contracts";
 import "./style.css";
 
@@ -163,9 +163,14 @@ function App() {
     const detach = (publication: TrackPublication) => publication.track?.detach().forEach(el => el.remove());
     room.on(RoomEvent.TrackSubscribed, (_track, publication, participant) => attach(publication, participant));
     room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => detach(publication));
-    room.on(RoomEvent.TrackPublished, (publication, participant) => { if (publication.track) attach(publication, participant); });
+    room.on(RoomEvent.TrackPublished, (publication, participant) => {
+      const remotePublication = publication as RemoteTrackPublication;
+      remotePublication.setSubscribed(true);
+      if (remotePublication.track) attach(remotePublication, participant);
+    });
     room.on(RoomEvent.ParticipantConnected, (participant) => {
       participant.videoTrackPublications.forEach(publication => {
+        publication.setSubscribed(true);
         if (publication.track) attach(publication, participant);
       });
     });
@@ -190,6 +195,7 @@ function App() {
       setLkState("connected");
       room.remoteParticipants.forEach(participant => {
         participant.videoTrackPublications.forEach(publication => {
+          publication.setSubscribed(true);
           if (publication.track) attach(publication, participant);
         });
       });
