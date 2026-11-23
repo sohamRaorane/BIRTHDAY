@@ -1,0 +1,27 @@
+{
+  "name": "project-surprise",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "overrides": {
+    "effect": "3.22.1"
+  },
+  "scripts": {
+    "dev:web": "npm --workspace @surprise/web run dev",
+    "dev:api": "node --env-file=.env --import tsx --watch apps/api/src/index.ts",
+    "db:generate": "node --env-file=.env ./apps/api/node_modules/prisma/build/index.js generate --config apps/api/prisma.config.ts",
+    "db:migrate": "node --env-file=.env ./apps/api/node_modules/prisma/build/index.js migrate dev --config apps/api/prisma.config.ts --name init",
+    "db:deploy": "node --env-file=.env ./apps/api/node_modules/prisma/build/index.js migrate deploy --config apps/api/prisma.config.ts",
+    "test:e2e": "playwright test",
+    "build": "npm run build --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
+  },
+  "dependencies": {
+    "@prisma/debug": "^7.10.1"
+  }
+}

@@ -1,0 +1,15 @@
+# Web integration notes
+
+The client follows the current API implementation in `apps/api/src/index.ts` where its shapes are available. The shared `packages/contracts` interfaces do not yet cover API envelopes, chat messages, media metadata, or LiveKit credentials, so the web client defines those wire types locally.
+
+- `POST /meetings/:code/join` and `GET /meetings/:id/snapshot` return `{ snapshot, messages, participantId }`; join also establishes the participant session cookie. `POST /meetings` instead returns `{ meeting, participantId, ... }`. The client normalizes both this shape and the older `{ meeting, participants, messages }` envelope.
+- `POST /meetings/:id/livekit-token` returns `{ token, url, ... }`. The client stores these short-lived credentials for the active tab and only connects LiveKit after a successful join/create exchange. Media publishing stays disabled until the participant clicks a media control.
+- Birthday media playback URL comes from `snapshot.media.playbackUrl`, and the organizer upload `PUT /meetings/:id/organizer/media` returns `{ media: { playbackUrl, ... } }`. Both point to the authenticated `GET /meetings/:id/media` route; the browser video element sends the current session cookies.
+- Organizer upload uses multipart field `file` with `PUT /meetings/:id/organizer/media`; the backend currently validates and stores the upload in that request rather than returning a separate presigned-upload phase.
+- Invitation creation uses `POST /meetings/:id/invitations`, whose current response contains `inviteUrl`. The UI copies this returned URL only after the backend creates the invitation. Current invitation links use `/join/:roomCode?token=...`; the web router also accepts the legacy `?invite=...` and `?code=...` query forms.
+- Socket.IO automatically joins the meeting room from the authenticated participant session when it connects; current API code has no `meeting:join` handler. Server events are flat objects with `schemaVersion` and `eventId` fields. `chat:send` accepts `{ meetingId, requestId, body }`; the client uses an acknowledgment to surface send failures.
+- After LiveKit connects, the browser calls `POST /meetings/:id/livekit/connected` so the backend can verify provider presence before updating readiness. Local camera, microphone, and screen-share publication changes are reported through the matching Socket.IO events.
+- The browser does not emit `birthday:video-completed`. When playback ends, organizers call `POST /meetings/:id/organizer/video/end`; other participants call `POST /meetings/:id/video/end`, which the backend restricts to the birthday participant and validates against the current playback state. Reveal handlers only refresh server state and never toggle local devices.
+- No meeting-list endpoint is defined in the current API implementation, so the dashboard shows the real empty state and links to create or join rather than inserting placeholder meetings.
+
+The Vite dev server proxies `/api` and Socket.IO's `/socket.io` path to `http://localhost:3001`.
