@@ -18,8 +18,8 @@
     "test:e2e": "playwright test",
     "build": "npm run build --workspace @surprise/api && npm run build --workspace @surprise/web",
     "start": "node apps/api/dist/index.js",
-    "db:generate:render": "node ./apps/api/node_modules/prisma/build/index.js generate --config apps/api/prisma.config.ts",
-    "db:deploy:render": "node ./apps/api/node_modules/prisma/build/index.js migrate deploy --config apps/api/prisma.config.ts"
+    "db:generate:render": "npm --workspace @surprise/api run db:generate",
+    "db:deploy:render": "npm --workspace @surprise/api run db:deploy"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1"
