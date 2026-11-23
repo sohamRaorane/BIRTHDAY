@@ -252,6 +252,16 @@ router.post("/meetings/:id/organizer/recording/stop", controlLimit, async (req, 
 router.post("/meetings/:id/chat", chatHttpLimit, async (req, res) => { const m = await getMeeting(req); const p = await getParticipant(req, m.id); const input = parse(chatSchema, req.body); if (p.leftAt) fail(403, "PARTICIPANT_LEFT", "Rejoin this meeting to chat"); const message = await prisma.chatMessage.create({ data: { meetingId: m.id, participantId: p.id, body: input.body }, include: { participant: { select: { id: true, displayName: true, visibility: true } } } }); const dto = { id: message.id, body: message.body, createdAt: message.createdAt, participant: { id: p.id, displayName: p.displayName } }; io.to(`meeting:${m.id}:organizer`).emit("chat:message", eventEnvelope(dto)); res.status(201).json(dto); });
 
 app.use("/api/v1", router);
+if (isProduction) {
+  const webDist = path.resolve(process.cwd(), "apps/web/dist");
+  app.use(express.static(webDist));
+  app.use((req, res, next) => {
+    if (req.method === "GET" && req.accepts("html") && !req.path.startsWith("/api/")) {
+      return res.sendFile(path.join(webDist, "index.html"));
+    }
+    next();
+  });
+}
 app.use((req, _res, next) => next(Object.assign(new Error("Route not found"), { status: 404, code: "NOT_FOUND" })));
 app.use((error: unknown, req: Request, res: Response, _next: NextFunction) => {
   const e = error as { status?: number; code?: string; message?: string };
