@@ -152,6 +152,8 @@ function App() {
         if (target) {
           el.dataset.trackSid = publication.trackSid;
           if (publication.source === Track.Source.ScreenShare) {
+            target.classList.add("screen-sharing");
+            el.dataset.screenShare = "true";
             const existing = target.querySelector('[data-screen-share="true"]');
             if (existing) existing.replaceWith(el);
             else { el.dataset.screenShare = "true"; target.appendChild(el); }
@@ -195,7 +197,9 @@ function App() {
         }
       }
       if (publication.source === Track.Source.ScreenShare) {
-        stageRef.current?.querySelector('[data-screen-share="true"]')?.remove();
+        const stage = stageRef.current;
+        stage?.querySelector('[data-screen-share="true"]')?.remove();
+        stage?.classList.remove("screen-sharing");
       }
     };
     room.on(RoomEvent.TrackSubscribed, (_track, publication, participant) => attach(publication, participant));
