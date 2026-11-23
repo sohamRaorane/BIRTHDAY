@@ -151,16 +151,53 @@ function App() {
         const target = publication.source === Track.Source.ScreenShare ? stageRef.current : peopleStripRef.current;
         if (target) {
           el.dataset.trackSid = publication.trackSid;
-          const existing = target.querySelector(`[data-track-sid="${publication.trackSid}"]`);
-          if (existing) existing.replaceWith(el);
-          else target.appendChild(el);
+          if (publication.source === Track.Source.ScreenShare) {
+            const existing = target.querySelector('[data-screen-share="true"]');
+            if (existing) existing.replaceWith(el);
+            else { el.dataset.screenShare = "true"; target.appendChild(el); }
+          } else {
+            const tile = target.querySelector(`[data-camera-participant="${participant.identity}"]`) as HTMLDivElement | null
+              ?? (() => {
+                const created = document.createElement("div");
+                created.className = "camera-tile";
+                created.dataset.cameraParticipant = participant.identity;
+                const label = document.createElement("span");
+                label.className = "camera-name";
+                label.textContent = participant.name || "Participant";
+                created.appendChild(label);
+                target.appendChild(created);
+                return created;
+              })();
+            tile.querySelectorAll("video").forEach(video => video.remove());
+            el.classList.add("camera-video");
+            tile.appendChild(el);
+            const empty = target.querySelector(".empty-state");
+            empty?.remove();
+          }
         }
       } else {
         el.classList.add("remote-audio");
         stageRef.current?.appendChild(el);
       }
     };
-    const detach = (publication: TrackPublication) => publication.track?.detach().forEach(el => el.remove());
+    const detach = (publication: TrackPublication) => {
+      publication.track?.detach().forEach(el => el.remove());
+      if (publication.source !== Track.Source.ScreenShare && peopleStripRef.current) {
+        peopleStripRef.current.querySelectorAll<HTMLElement>("[data-camera-participant]").forEach(tile => {
+          if (!tile.querySelector("video")) tile.remove();
+        });
+        if (!peopleStripRef.current.querySelector(".camera-tile")) {
+          peopleStripRef.current.querySelector(".empty-state")?.remove();
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.textContent = "Cameras will appear here.";
+          peopleStripRef.current.appendChild(empty);
+        }
+      }
+      if (publication.source === Track.Source.ScreenShare) {
+        stageRef.current?.querySelector('[data-screen-share="true"]')?.remove();
+      }
+    };
     room.on(RoomEvent.TrackSubscribed, (_track, publication, participant) => attach(publication, participant));
     room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => detach(publication));
     room.on(RoomEvent.TrackPublished, (publication, participant) => {
