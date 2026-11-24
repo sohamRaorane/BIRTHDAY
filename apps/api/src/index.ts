@@ -40,7 +40,27 @@ const clearSessions = async (req: Request, res: Response) => {
 };
 
 app.disable("x-powered-by");
-app.use(helmet());
+const liveKitUrl = process.env.LIVEKIT_URL?.trim();
+let liveKitConnectSrc: string[] = [];
+if (liveKitUrl) {
+  try {
+    const parsed = new URL(liveKitUrl);
+    if (["ws:", "wss:", "http:", "https:"].includes(parsed.protocol)) liveKitConnectSrc = [parsed.origin];
+  } catch {
+    liveKitConnectSrc = [];
+  }
+}
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "connect-src": ["'self'", ...liveKitConnectSrc],
+      "media-src": ["'self'", "blob:"],
+      "worker-src": ["'self'", "blob:"],
+      "img-src": ["'self'", "data:", "blob:"],
+    },
+  },
+}));
 app.use(cors({ origin, credentials: true }));
 app.use(express.json({ limit: "256kb" }));
 app.use(cookieParser());
