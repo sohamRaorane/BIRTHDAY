@@ -17,6 +17,7 @@ import { livekitProvider } from "./providers/livekit.js";
 import { mediaStorage, maxVideoBytes } from "./providers/media-storage.js";
 
 const app = express();
+app.set("trust proxy", 1);
 const server = createServer(app);
 const origin = process.env.APP_ORIGIN ?? "http://localhost:5173";
 const isProduction = process.env.NODE_ENV === "production";

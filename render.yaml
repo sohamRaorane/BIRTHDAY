@@ -3,9 +3,12 @@ services:
     name: littlemoment
     runtime: node
     plan: free
-    buildCommand: npm ci --include=dev && npm run db:generate:render && npm run build && npm run db:deploy:render
+    healthCheckPath: /api/v1/health
+    buildCommand: npm install --include=dev --no-audit --no-fund && npm run db:generate:render && npm run build && npm run db:deploy:render
     startCommand: npm start
     envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
       - key: NODE_ENV
         value: production
       - key: PORT

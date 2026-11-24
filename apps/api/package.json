@@ -13,6 +13,7 @@
     "db:deploy": "node ../../node_modules/prisma/build/index.js migrate deploy --config prisma.config.ts"
   },
   "dependencies": {
+    "@livekit/protocol": "^1.54.1",
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
     "@prisma/debug": "^7.10.1",
