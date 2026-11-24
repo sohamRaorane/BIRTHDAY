@@ -6,3 +6,58 @@
 .meeting-art{z-index:1;width:148px;height:112px;margin-bottom:38px;border:1px solid #fff9;border-radius:18px;background:linear-gradient(145deg,#f8f4f0,#ded4d6);display:grid;place-items:center;box-shadow:0 12px 30px #654b4b25}.meeting-art span{font:700 27px 'DM Sans',sans-serif;color:#9b7175;letter-spacing:.08em}
 
 .stage-main{min-height:520px}.stage-main video.screen-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;background:#17131b}.stage-main.screen-sharing>.waiting-state,.stage-main.screen-sharing>.reveal-state,.stage-main.screen-sharing>.unavailable-state{display:none}.people-strip{min-height:150px;height:150px;gap:12px}.people-strip .person-tile{display:none}.camera-tile{position:relative;width:190px;height:122px;flex:none;border-radius:9px;overflow:hidden;background:#2d2731;border:1px solid #ebe2e1}.camera-tile .camera-video{width:100%;height:100%;object-fit:cover}.camera-name{position:absolute;z-index:2;left:8px;bottom:7px;color:#fff;background:#201a23b8;border-radius:5px;padding:3px 6px;font-size:10px}.people-strip .empty-state{margin:auto}.participant-video,.screen-video,.remote-audio{pointer-events:none}.room-layout{grid-template-columns:minmax(0,1.7fr) 320px}.drawer-action span{color:#9b666b}.upload-state code{display:block;overflow-wrap:anywhere;margin-top:4px;color:#5c4c55}
+
+@media (max-width:700px){
+  body{overflow-x:hidden}
+  .app-shell{min-height:100dvh}
+  .topbar{padding:0 16px}
+  .topbar .profile{max-width:44px;gap:0;font-size:0}
+  .topbar .profile .avatar{margin:0}
+  .room-page{width:calc(100% - 20px);padding:12px 0 calc(18px + env(safe-area-inset-bottom))}
+  .room-heading{gap:10px;margin-bottom:12px}
+  .room-heading h1{font-size:23px;line-height:1.15}
+  .back-link{margin-bottom:7px}
+  .room-head-actions{width:100%;gap:8px}
+  .room-head-actions .outline-btn,.room-head-actions .organizer-pill{flex:1;padding:10px 8px;font-size:11px}
+  .room-layout{gap:10px}
+  .stage{padding:8px}
+  .stage-main{min-height:220px;height:38dvh;max-height:360px}
+  .waiting-state,.reveal-state,.unavailable-state{padding:24px 12px}
+  .waiting-state h2,.reveal-state h2,.unavailable-state h2{font-size:25px}
+  .meeting-art{width:118px;height:88px;margin-bottom:24px}
+  .meeting-art span{font-size:22px}
+  .connection-line{padding:9px 2px 7px;font-size:10px}
+  .connection-hint{display:none}
+  .people-strip{height:108px;min-height:108px;padding:8px 0;gap:8px}
+  .camera-tile{width:138px;height:92px}
+  .camera-name{max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .controlbar{position:sticky;bottom:0;z-index:5;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0 -8px -8px;padding:8px;background:#fff;box-shadow:0 -6px 18px #4c3f4610}
+  .media-control,.leave-btn{min-height:44px;padding:8px 6px;margin:0;font-size:11px}
+  .leave-btn{grid-column:1/-1;background:#9a565a;border-color:#9a565a;color:#fff}
+  .room-sidebar{min-height:330px;height:48dvh;max-height:520px}
+  .sidebar-head{height:50px}
+  .chat-list,.people-list{max-height:none}
+  .chat-compose{position:sticky;bottom:0;background:#fff;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+  .chat-compose input{min-height:44px}
+  .chat-compose button{min-width:58px}
+  .organizer-drawer{right:0;left:0;top:auto;bottom:0;width:100%;max-height:82dvh;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -18px 60px #32253024}
+  .modal-backdrop{align-items:end;padding:0}
+  .modal{width:100%;max-height:92dvh;overflow-y:auto;border-radius:18px 18px 0 0;padding:30px 20px calc(24px + env(safe-area-inset-bottom))}
+  .room-error{align-items:flex-start}
+  .toast{bottom:calc(18px + env(safe-area-inset-bottom));width:calc(100% - 32px);text-align:center}
+  .site-footer{min-height:52px;padding:0 16px}
+  .footer-copy{display:none}
+  .footer-privacy{margin-left:auto}
+}
+
+@media (max-width:420px){
+  .room-page{width:calc(100% - 12px)}
+  .stage-main{height:34dvh;min-height:205px}
+  .room-sidebar{height:44dvh}
+  .room-head-actions .outline-btn{display:none}
+  .room-head-actions .organizer-pill{width:100%}
+  .camera-tile{width:124px;height:84px}
+  .people-strip{height:100px;min-height:100px}
+  .controlbar{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .media-control{white-space:normal}
+}
