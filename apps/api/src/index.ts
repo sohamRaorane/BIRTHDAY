@@ -40,7 +40,7 @@ const clearSessions = async (req: Request, res: Response) => {
 };
 
 app.disable("x-powered-by");
-const liveKitUrl = process.env.LIVEKIT_URL?.trim();
+const liveKitUrl = process.env.LIVEKIT_URL?.trim().replace(/^[\s"']+|[\s"']+$/g, "");
 let liveKitConnectSrc: string[] = [];
 if (liveKitUrl) {
   try {
@@ -54,7 +54,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      "connect-src": ["'self'", ...liveKitConnectSrc],
+      "connect-src": ["'self'", "wss://*.livekit.cloud", "https://*.livekit.cloud", ...liveKitConnectSrc],
       "media-src": ["'self'", "blob:"],
       "worker-src": ["'self'", "blob:"],
       "img-src": ["'self'", "data:", "blob:"],
