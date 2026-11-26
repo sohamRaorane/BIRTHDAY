@@ -81,3 +81,8 @@
   .controlbar{grid-template-columns:repeat(2,minmax(0,1fr))}
   .media-control{white-space:normal}
 }
+
+.reveal-state{width:100%;padding:12px}
+.reveal-photo{display:block;width:auto;max-width:100%;max-height:min(460px,calc(100vh - 180px));margin:0 auto;object-fit:contain;border-radius:6px;box-shadow:0 12px 36px #0006}
+@media(max-width:700px){.reveal-photo{max-height:calc(38dvh - 24px)}}
+@media(max-width:420px){.reveal-photo{max-height:calc(34dvh - 24px)}}
