@@ -144,7 +144,7 @@ function App() {
     if (!credentials.url || !credentials.token) { setLkState("unavailable"); return; }
     const room = new Room({ adaptiveStream: true, dynacast: true }); roomRef.current = room; setLkState("connecting");
     const attach = (publication: TrackPublication, participant: Participant) => {
-      const track = publication.track; if (!track) return;
+      const track = publication.track; if (!track || (participant === room.localParticipant && track.kind === Track.Kind.Audio)) return;
       const el = track.attach(); el.dataset.participant = participant.identity;
       if (track.kind === Track.Kind.Video) {
         el.classList.add(publication.source === Track.Source.ScreenShare ? "screen-video" : "participant-video");
